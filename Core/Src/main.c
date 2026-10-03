@@ -106,6 +106,7 @@ int main(void)
   DWT_Init();
   OLED_Init();
   OLED_Clear();
+  OLED_ShowString(0, 0, "Smart car");
   OLED_ShowChinese(0, 2, ZH_ZHI);
   OLED_ShowChinese(16, 2, ZH_NENG);
   OLED_ShowChinese(32, 2, ZH_CHE);
