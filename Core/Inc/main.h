@@ -59,10 +59,19 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define led_on_broad_Pin GPIO_PIN_13
 #define led_on_broad_GPIO_Port GPIOC
-#define SOUND_Pin GPIO_PIN_0
-#define SOUND_GPIO_Port GPIOB
-#define LED3_Pin GPIO_PIN_1
-#define LED3_GPIO_Port GPIOB
+#define SOUND_Pin GPIO_PIN_14
+#define SOUND_GPIO_Port GPIOC
+#define LED3_Pin GPIO_PIN_15
+#define LED3_GPIO_Port GPIOC
+#define Encoder_A_Pin GPIO_PIN_0
+#define Encoder_A_GPIO_Port GPIOA
+#define Encoder_A_EXTI_IRQn EXTI0_IRQn
+#define Encoder_B_Pin GPIO_PIN_1
+#define Encoder_B_GPIO_Port GPIOA
+#define Encoder_B_EXTI_IRQn EXTI1_IRQn
+#define Encoder_C_Pin GPIO_PIN_2
+#define Encoder_C_GPIO_Port GPIOA
+#define Encoder_C_EXTI_IRQn EXTI2_IRQn
 #define LED2_Pin GPIO_PIN_10
 #define LED2_GPIO_Port GPIOB
 #define LED1_Pin GPIO_PIN_11
