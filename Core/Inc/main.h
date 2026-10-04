@@ -66,12 +66,12 @@ void Error_Handler(void);
 #define Encoder_A_Pin GPIO_PIN_0
 #define Encoder_A_GPIO_Port GPIOA
 #define Encoder_A_EXTI_IRQn EXTI0_IRQn
-#define Encoder_B_Pin GPIO_PIN_1
-#define Encoder_B_GPIO_Port GPIOA
-#define Encoder_B_EXTI_IRQn EXTI1_IRQn
-#define Encoder_C_Pin GPIO_PIN_2
+#define Encoder_C_Pin GPIO_PIN_1
 #define Encoder_C_GPIO_Port GPIOA
-#define Encoder_C_EXTI_IRQn EXTI2_IRQn
+#define Encoder_C_EXTI_IRQn EXTI1_IRQn
+#define Encoder_B_Pin GPIO_PIN_2
+#define Encoder_B_GPIO_Port GPIOA
+#define Encoder_B_EXTI_IRQn EXTI2_IRQn
 #define LED2_Pin GPIO_PIN_10
 #define LED2_GPIO_Port GPIOB
 #define LED1_Pin GPIO_PIN_11

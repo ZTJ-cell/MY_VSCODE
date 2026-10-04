@@ -24,6 +24,7 @@
 #include "key.h"
 #include "oled.h"
 #include "oledfont.h"
+#include "encoder.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -73,6 +74,10 @@ void delay_us(uint32_t us)
   uint32_t start = DWT->CYCCNT;
   uint32_t cycles = us * (SystemCoreClock / 1000000);
   while (DWT->CYCCNT - start < cycles);
+}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  Encoder_EXTI_Handler(GPIO_Pin);
 }
 /* USER CODE END 0 */
 
@@ -378,8 +383,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Encoder_A_Pin Encoder_B_Pin Encoder_C_Pin */
-  GPIO_InitStruct.Pin = Encoder_A_Pin|Encoder_B_Pin|Encoder_C_Pin;
+  /*Configure GPIO pins : Encoder_A_Pin Encoder_C_Pin Encoder_B_Pin */
+  GPIO_InitStruct.Pin = Encoder_A_Pin|Encoder_C_Pin|Encoder_B_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
