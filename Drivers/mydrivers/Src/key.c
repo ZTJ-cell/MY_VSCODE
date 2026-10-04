@@ -20,3 +20,26 @@ uint8_t key_scan(void)
     }
     return 0;
 }
+
+/* PA9：页面切换按键，逻辑同上，200ms 去抖 */
+uint8_t key2_scan(void)
+{
+    static uint32_t last_state = 1;
+    static uint32_t last_time = 0;
+    uint8_t current_state = HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin);
+    uint32_t current_time = HAL_GetTick();
+    if (last_state == 1 && current_state == 0)
+    {
+        if (current_time - last_time > 200)
+        {
+            last_time = current_time;
+            last_state = 0;
+            return 1;
+        }
+    }
+    else if (current_state == 1)
+    {
+        last_state = 1;
+    }
+    return 0;
+}

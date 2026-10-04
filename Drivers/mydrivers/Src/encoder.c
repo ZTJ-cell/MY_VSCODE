@@ -2,6 +2,7 @@
 
 volatile uint16_t encoder_cw_count  = 0;
 volatile uint16_t encoder_ccw_count = 0;
+volatile int16_t  led_duty = 50;         /* PWM 亮度 0~100，初始 50% */
 
 static volatile uint8_t  enc_last = 3;   /* 上次 AB：(A<<1)|B，上拉静止 = 11 */
 static volatile uint8_t  enc_cur  = 3;
@@ -38,11 +39,21 @@ void Encoder_EXTI_Handler(uint16_t GPIO_Pin)
 
         if (dir > 0)
         {
-            if (++enc_step == 4)  { enc_step = 0; encoder_cw_count++;  }
+            if (++enc_step == 4)
+            {
+                enc_step = 0;
+                encoder_cw_count++;
+                if (led_duty < 100) led_duty += 5;   /* 顺时针亮度 +5% */
+            }
         }
         else if (dir < 0)
         {
-            if (--enc_step == -4) { enc_step = 0; encoder_ccw_count++; }
+            if (--enc_step == -4)
+            {
+                enc_step = 0;
+                encoder_ccw_count++;
+                if (led_duty > 0)   led_duty -= 5;   /* 逆时针亮度 -5% */
+            }
         }
     }
     else if (GPIO_Pin == Encoder_C_Pin)
@@ -53,6 +64,7 @@ void Encoder_EXTI_Handler(uint16_t GPIO_Pin)
             encoder_cw_count  = 0;
             encoder_ccw_count = 0;
             enc_step          = 0;
+            led_duty          = 0;   /* 按键：亮度归零，LED 灭 */
         }
     }
 }

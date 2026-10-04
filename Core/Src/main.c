@@ -122,8 +122,9 @@ int main(void)
   OLED_ShowChinese(16, 2, ZH_NENG);
   OLED_ShowChinese(32, 2, ZH_CHE);
   Encoder_Init();
-  OLED_ShowString(0, 4, "CW :");
-  OLED_ShowString(0, 6, "CCW:");
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  uint8_t page = 0;                 /* 0=标题页 1=旋钮页 */
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -166,16 +167,56 @@ int main(void)
         HAL_GPIO_WritePin(SOUND_GPIO_Port,SOUND_Pin,GPIO_PIN_RESET);
         break;
     }
+    /* PA9：专门用于切页（标题页 <-> 旋钮页） */
+    if (key2_scan() == 1)
+    {
+      page = !page;
+      OLED_Clear();
+      if (page == 0)
+      {
+        OLED_ShowString(0, 0, "Smart car");
+        OLED_ShowChinese(0, 2, ZH_ZHI);
+        OLED_ShowChinese(16, 2, ZH_NENG);
+        OLED_ShowChinese(32, 2, ZH_CHE);
+      }
+      else
+      {
+        OLED_ShowString(0, 0, "CW :");
+        OLED_ShowString(0, 2, "CCW:");
+        OLED_ShowString(0, 4, "Duty:");
+      }
+    }
+
+    /* PB15：点灯（翻转 PB8） */
     if (key_scan() == 1)
     {
       HAL_GPIO_TogglePin(led_GPIO_Port, led_Pin); 
     }
+
+    /* 亮度实时跟随旋钮，跟当前在哪一页无关 */
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, (uint32_t)led_duty * 20);
+
+    /* 只在旋钮页刷数字 */
+    if (page == 1)
+    {
+      OLED_ShowNum(40, 0, encoder_cw_count,  5);
+      OLED_ShowNum(40, 2, encoder_ccw_count, 5);
+      OLED_ShowNum(48, 4, led_duty, 3);
+      OLED_ShowString(72, 4, "%");
+    }
+
+    HAL_Delay(50);
+
+
+
   }
 
   if (I2C_WaitAck() != 0)
   {
     HAL_GPIO_TogglePin(led_GPIO_Port, led_Pin);
   }
+
+
   /* USER CODE END 3 */
 }
 
@@ -320,14 +361,15 @@ static void MX_TIM3_Init(void)
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* USER CODE BEGIN TIM3_Init 1 */
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = 7;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 1999;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -339,15 +381,28 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
 
 }
 
@@ -410,6 +465,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(key_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : key2_Pin */
+  GPIO_InitStruct.Pin = key2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(key2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : SCL_Pin SDA_Pin */
   GPIO_InitStruct.Pin = SCL_Pin|SDA_Pin;

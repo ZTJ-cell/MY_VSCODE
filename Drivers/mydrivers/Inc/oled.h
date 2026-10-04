@@ -15,4 +15,5 @@ void delay_us(uint32_t us);
 void OLED_SetCursor(uint8_t x, uint8_t y);
 void OLED_WriteData(uint8_t data);
 uint8_t I2C_WaitAck(void);
+void OLED_ShowNum(uint8_t x, uint8_t y, uint32_t num, uint8_t len);
 #endif

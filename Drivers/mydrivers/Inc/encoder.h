@@ -12,6 +12,7 @@
 
 extern volatile uint16_t encoder_cw_count;    /* 顺时针 */
 extern volatile uint16_t encoder_ccw_count;   /* 逆时针 */
+extern volatile int16_t  led_duty;            /* PWM 亮度 0~100，步进 5，初始 50 */
 
 void Encoder_Init(void);
 void Encoder_EXTI_Handler(uint16_t GPIO_Pin);

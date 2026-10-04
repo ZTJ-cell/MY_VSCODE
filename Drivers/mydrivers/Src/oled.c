@@ -157,3 +157,13 @@ void OLED_ShowString(uint8_t x, uint8_t y, const char *str) {
         }
     }
 }
+
+void OLED_ShowNum(uint8_t x, uint8_t y, uint32_t num, uint8_t len)
+{
+    for (uint8_t i = 0; i < len; i++)
+    {
+        uint32_t div = 1;
+        for (uint8_t j = 0; j < len - 1 - i; j++) div *= 10;
+        OLED_ShowChar(x + 8 * i, y, (uint8_t)(num / div % 10 + '0'));
+    }
+}
