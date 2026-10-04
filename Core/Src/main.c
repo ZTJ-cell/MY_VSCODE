@@ -121,6 +121,9 @@ int main(void)
   OLED_ShowChinese(0, 2, ZH_ZHI);
   OLED_ShowChinese(16, 2, ZH_NENG);
   OLED_ShowChinese(32, 2, ZH_CHE);
+  Encoder_Init();
+  OLED_ShowString(0, 4, "CW :");
+  OLED_ShowString(0, 6, "CCW:");
   /* USER CODE END 2 */
 
   /* Infinite loop */
