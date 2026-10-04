@@ -3,13 +3,12 @@
 
 #include "main.h"
 
-/* EC11：A -> PA0(EXTI0)  B -> PA1(EXTI1)  C(按键) -> PA2(EXTI2) */
-#define ENCODER_A_Pin         GPIO_PIN_0
-#define ENCODER_A_GPIO_Port   GPIOA
-#define ENCODER_B_Pin         GPIO_PIN_1
-#define ENCODER_B_GPIO_Port   GPIOA
-#define ENCODER_KEY_Pin       GPIO_PIN_2
-#define ENCODER_KEY_GPIO_Port GPIOA
+/* 引脚宏用 CubeMX 生成的（main.h 里）：
+ *   Encoder_A_Pin   -> PA0   A 相, EXTI0
+ *   Encoder_B_Pin   -> PA1   B 相, EXTI1
+ *   Encoder_KEY_Pin -> PA2   按键, EXTI2
+ * （CubeMX 里把标签改成 Encoder_A / Encoder_B / Encoder_KEY）
+ */
 
 extern volatile uint16_t encoder_cw_count;    /* 顺时针 */
 extern volatile uint16_t encoder_ccw_count;   /* 逆时针 */

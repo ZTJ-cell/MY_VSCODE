@@ -18,38 +18,18 @@ static const int8_t quad_table[16] = {
 
 void Encoder_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-
-    GPIO_InitStruct.Pin  = ENCODER_A_Pin | ENCODER_B_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    HAL_GPIO_Init(ENCODER_A_GPIO_Port, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin  = ENCODER_KEY_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    HAL_GPIO_Init(ENCODER_KEY_GPIO_Port, &GPIO_InitStruct);
-
-    HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-    HAL_NVIC_SetPriority(EXTI1_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-    HAL_NVIC_SetPriority(EXTI2_IRQn, 1, 0);
-    HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
-    enc_cur  = (uint8_t)((HAL_GPIO_ReadPin(ENCODER_A_GPIO_Port, ENCODER_A_Pin) << 1)
-                       |  HAL_GPIO_ReadPin(ENCODER_B_GPIO_Port, ENCODER_B_Pin));
+    /* GPIO / EXTI / NVIC 全部由 CubeMX 的 MX_GPIO_Init() 配好，这里只记初值 */
+    enc_cur  = (uint8_t)((HAL_GPIO_ReadPin(Encoder_A_GPIO_Port, Encoder_A_Pin) << 1)
+                       |  HAL_GPIO_ReadPin(Encoder_B_GPIO_Port, Encoder_B_Pin));
     enc_last = enc_cur;
 }
 
 void Encoder_EXTI_Handler(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == ENCODER_A_Pin || GPIO_Pin == ENCODER_B_Pin)
+    if (GPIO_Pin == Encoder_A_Pin || GPIO_Pin == Encoder_B_Pin)
     {
-        uint8_t a = HAL_GPIO_ReadPin(ENCODER_A_GPIO_Port, ENCODER_A_Pin);
-        uint8_t b = HAL_GPIO_ReadPin(ENCODER_B_GPIO_Port, ENCODER_B_Pin);
+        uint8_t a = HAL_GPIO_ReadPin(Encoder_A_GPIO_Port, Encoder_A_Pin);
+        uint8_t b = HAL_GPIO_ReadPin(Encoder_B_GPIO_Port, Encoder_B_Pin);
 
         enc_last = enc_cur;
         enc_cur  = (uint8_t)((a << 1) | b);
@@ -65,7 +45,7 @@ void Encoder_EXTI_Handler(uint16_t GPIO_Pin)
             if (--enc_step == -4) { enc_step = 0; encoder_ccw_count++; }
         }
     }
-    else if (GPIO_Pin == ENCODER_KEY_Pin)
+    else if (GPIO_Pin == Encoder_C_Pin)
     {
         if (HAL_GetTick() - key_tick > 200)
         {
