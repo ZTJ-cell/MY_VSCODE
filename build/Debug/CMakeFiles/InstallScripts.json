@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/ztj/vscode/STM32F103C8/STM32F103C8/build/Debug/cmake_install.cmake",
-		"/home/ztj/vscode/STM32F103C8/STM32F103C8/build/Debug/cmake/stm32cubemx/cmake_install.cmake",
-		"/home/ztj/vscode/STM32F103C8/STM32F103C8/build/Debug/Drivers/mydrivers/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
