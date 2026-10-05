@@ -10,7 +10,7 @@ extern void delay_us(uint32_t us);
 // 1. 软件 I2C 底层时序 (全部加 static，私有化)
 // ==========================================
 static void I2C_Delay(void) {
-    delay_us(0); // 8MHz 下，精确延时 2 微秒，屏幕不亮可改成 5
+    delay_us(2); // 8MHz 下，精确延时 2 微秒，屏幕不亮可改成 5
 }
 
 static void I2C_Start(void) {
