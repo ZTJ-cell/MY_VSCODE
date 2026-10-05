@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "adc.h"
 #include "key.h"
 #include "oled.h"
 #include "oledfont.h"
@@ -126,8 +127,9 @@ int main(void)
   OLED_ShowChinese(16, 2, ZH_NENG);
   OLED_ShowChinese(32, 2, ZH_CHE);
   Encoder_Init();
+  ADC_AppInit();                    /* ADC 上电校准 */
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
-  uint8_t page = 0;                 /* 0=标题页 1=旋钮页 */
+  uint8_t page = 0;                 /* 0=标题 1=旋钮 2=光敏电压 */
 
   /* USER CODE END 2 */
 
@@ -171,10 +173,14 @@ int main(void)
         HAL_GPIO_WritePin(SOUND_GPIO_Port,SOUND_Pin,GPIO_PIN_RESET);
         break;
     }
-    /* PA9：专门用于切页（标题页 <-> 旋钮页） */
+    /* PA9：切页（0=标题 1=旋钮 2=光敏电压） */
     if (key2_scan() == 1)
     {
-      page = !page;
+      page++;
+      if (page > 2)
+      {
+        page = 0;
+      }
       OLED_Clear();
       if (page == 0)
       {
@@ -183,11 +189,17 @@ int main(void)
         OLED_ShowChinese(16, 2, ZH_NENG);
         OLED_ShowChinese(32, 2, ZH_CHE);
       }
-      else
+      else if (page == 1)
       {
         OLED_ShowString(0, 0, "CW :");
         OLED_ShowString(0, 2, "CCW:");
         OLED_ShowString(0, 4, "Duty:");
+      }
+      else
+      {
+        OLED_ShowString(0, 0, "Light Sensor");
+        OLED_ShowString(0, 2, "ADC:");
+        OLED_ShowString(0, 4, "mV :");
       }
     }
 
@@ -207,6 +219,13 @@ int main(void)
       OLED_ShowNum(40, 2, encoder_ccw_count, 5);
       OLED_ShowNum(48, 4, led_duty, 3);
       OLED_ShowString(72, 4, "%");
+    }
+    /* 光敏页：ADC 原始值 + 换算后的真实电压(mV) */
+    else if (page == 2)
+    {
+      uint16_t adc_raw = ADC_ReadRawAvg();
+      OLED_ShowNum(36, 2, adc_raw, 4);
+      OLED_ShowNum(36, 4, ADC_RAW_TO_MV(adc_raw), 4);
     }
     //HAL_Delay(50);
   }
@@ -308,6 +327,12 @@ static void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
+  /* 光敏模块输出阻抗较大，采样时间由 1.5 周期加长到 55.5 周期 */
+  sConfig.SamplingTime = ADC_SAMPLETIME_55CYCLES_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
   /* USER CODE END ADC1_Init 2 */
 
