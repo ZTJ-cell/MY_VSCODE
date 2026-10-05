@@ -205,10 +205,6 @@ int main(void)
       OLED_ShowString(72, 4, "%");
     }
 
-    HAL_Delay(50);
-
-
-
   }
 
   if (I2C_WaitAck() != 0)
